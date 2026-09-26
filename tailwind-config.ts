@@ -1,35 +1,26 @@
+import path from "path";
 import type { Config } from "tailwindcss";
-
+import PluginAPI from "tailwindcss"
 const svgToDataUri = require("mini-svg-data-uri");
 
 const {
   default: flattenColorPalette,
 } = require("tailwindcss/lib/util/flattenColorPalette");
 
-/**
- * Add all Tailwind colors as CSS variables.
- *
- * Example:
- * bg-slate-900
- *
- * becomes:
- *
- * var(--slate-900)
- */
 function addVariablesForColors({
   addBase,
   theme,
 }: {
-  addBase: (base: any) => void;
-  theme: any;
+  addBase: (base: Record<string, Record<string, string>>) => void;
+  theme: (path: string) => string;
 }) {
   const allColors = flattenColorPalette(theme("colors"));
 
   const newVars = Object.fromEntries(
     Object.entries(allColors).map(([key, value]) => [
       `--${key}`,
-      value,
-    ])
+      String(value),
+    ]),
   );
 
   addBase({
@@ -47,10 +38,7 @@ function addVariablesForColors({
 function addSvgPatterns({
   matchUtilities,
   theme,
-}: {
-  matchUtilities: any;
-  theme: any;
-}) {
+}: Pick<PluginAPI, "matchUtilities" | "theme">) {
   matchUtilities(
     {
       "bg-grid": (value: string) => ({
@@ -62,7 +50,7 @@ function addSvgPatterns({
             fill="none"
             stroke="${value}">
             <path d="M0 .5H31.5V32"/>
-          </svg>`
+          </svg>`,
         )}")`,
       }),
 
@@ -75,7 +63,7 @@ function addSvgPatterns({
             fill="none"
             stroke="${value}">
             <path d="M0 .5H31.5V32"/>
-          </svg>`
+          </svg>`,
         )}")`,
       }),
 
@@ -92,16 +80,14 @@ function addSvgPatterns({
               cy="10"
               r="1.6257413380501518"
             />
-          </svg>`
+          </svg>`,
         )}")`,
       }),
     },
     {
-      values: flattenColorPalette(
-        theme("backgroundColor")
-      ),
+      values: flattenColorPalette(theme("backgroundColor")),
       type: "color",
-    }
+    },
   );
 }
 
@@ -120,8 +106,7 @@ const config: Config = {
        * Custom animations
        */
       animation: {
-        spotlight:
-          "spotlight 2s ease 0.75s 1 forwards",
+        spotlight: "spotlight 2s ease 0.75s 1 forwards",
 
         scroll:
           "scroll var(--animation-duration, 40s) var(--animation-direction, forwards) linear infinite",
@@ -131,8 +116,7 @@ const config: Config = {
        * Custom background images
        */
       backgroundImage: {
-        "gradient-radial":
-          "radial-gradient(var(--tw-gradient-stops))",
+        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
 
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops)",
@@ -145,31 +129,25 @@ const config: Config = {
         spotlight: {
           "0%": {
             opacity: "0",
-            transform:
-              "translate(-72%, -62%) scale(0.5)",
+            transform: "translate(-72%, -62%) scale(0.5)",
           },
 
           "100%": {
             opacity: "1",
-            transform:
-              "translate(-50%, -40%) scale(1)",
+            transform: "translate(-50%, -40%) scale(1)",
           },
         },
 
         scroll: {
           to: {
-            transform:
-              "translate(calc(-50% - 0.5rem))",
+            transform: "translate(calc(-50% - 0.5rem))",
           },
         },
       },
     },
   },
 
-  plugins: [
-    addVariablesForColors,
-    addSvgPatterns,
-  ],
+  plugins: [addVariablesForColors, addSvgPatterns],
 };
 
 export default config;

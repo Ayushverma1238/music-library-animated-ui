@@ -12,7 +12,7 @@ type ButtonProps = {
   borderClassName?: string;
   duration?: number;
   className?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 };
 
 export function Button({
