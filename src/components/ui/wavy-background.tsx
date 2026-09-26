@@ -40,19 +40,17 @@ export const WavyBackground = ({
         return 0.001;
     }
   };
-  let canvas: HTMLCanvasElement;
   let ctx: CanvasRenderingContext2D;
 
   const init = () => {
-    const currentCanvas = canvasRef.current;
+    const canvas = canvasRef.current;
 
-    if (!currentCanvas) return;
+    if (!canvas) return;
 
-    const context = currentCanvas.getContext("2d");
+    const context = canvas.getContext("2d");
 
     if (!context) return;
 
-    canvas = currentCanvas;
     ctx = context;
 
     w = ctx.canvas.width = globalThis.innerWidth;
