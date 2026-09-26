@@ -29,9 +29,6 @@ export const WavyBackground = ({
   const noise = createNoise3D();
   let w: number, h: number, nt: number, i: number, x: number;
 
-  let canvas: HTMLCanvasElement | any;
-  let ctx: CanvasRenderingContext2D | any;
-
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const getSpeed = () => {
     switch (speed) {
@@ -43,19 +40,34 @@ export const WavyBackground = ({
         return 0.001;
     }
   };
+  let canvas: HTMLCanvasElement;
+  let ctx: CanvasRenderingContext2D;
 
   const init = () => {
-    canvas = canvasRef.current;
-    ctx = canvas.getContext("2d");
+    const currentCanvas = canvasRef.current;
+
+    if (!currentCanvas) return;
+
+    const context = currentCanvas.getContext("2d");
+
+    if (!context) return;
+
+    canvas = currentCanvas;
+    ctx = context;
+
     w = ctx.canvas.width = globalThis.innerWidth;
     h = ctx.canvas.height = globalThis.innerHeight;
+
     ctx.filter = `blur(${blur}px)`;
+
     nt = 0;
+
     globalThis.onresize = function () {
       w = ctx.canvas.width = globalThis.innerWidth;
       h = ctx.canvas.height = globalThis.innerHeight;
       ctx.filter = `blur(${blur}px)`;
     };
+
     render();
   };
 
@@ -66,7 +78,7 @@ export const WavyBackground = ({
     "#e879f9",
     "#22d3ee",
   ];
-  var y = 0;
+  let y = 0;
   const drawWave = (n: number) => {
     nt += getSpeed();
     for (i = 0; i < n; i++) {
