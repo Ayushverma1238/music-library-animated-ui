@@ -1,18 +1,33 @@
-import path from "path";
 import type { Config } from "tailwindcss";
-import PluginAPI from "tailwindcss"
-const svgToDataUri = require("mini-svg-data-uri");
 
+const svgToDataUri = require("mini-svg-data-uri");
 const {
   default: flattenColorPalette,
 } = require("tailwindcss/lib/util/flattenColorPalette");
+
+type AddBase = (
+  base: Record<string, Record<string, string>>,
+) => void;
+
+type Theme = (path: string) => Record<string, unknown>;
+
+type MatchUtilities = (
+  utilities: Record<
+    string,
+    (value: string) => Record<string, string>
+  >,
+  options: {
+    values: Record<string, string>;
+    type: string;
+  },
+) => void;
 
 function addVariablesForColors({
   addBase,
   theme,
 }: {
-  addBase: (base: Record<string, Record<string, string>>) => void;
-  theme: (path: string) => string;
+  addBase: AddBase;
+  theme: Theme;
 }) {
   const allColors = flattenColorPalette(theme("colors"));
 
@@ -38,7 +53,10 @@ function addVariablesForColors({
 function addSvgPatterns({
   matchUtilities,
   theme,
-}: Pick<PluginAPI, "matchUtilities" | "theme">) {
+}: {
+  matchUtilities: MatchUtilities;
+  theme: Theme;
+}) {
   matchUtilities(
     {
       "bg-grid": (value: string) => ({
@@ -102,9 +120,6 @@ const config: Config = {
 
   theme: {
     extend: {
-      /**
-       * Custom animations
-       */
       animation: {
         spotlight: "spotlight 2s ease 0.75s 1 forwards",
 
@@ -112,9 +127,6 @@ const config: Config = {
           "scroll var(--animation-duration, 40s) var(--animation-direction, forwards) linear infinite",
       },
 
-      /**
-       * Custom background images
-       */
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
 
@@ -122,9 +134,6 @@ const config: Config = {
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops)",
       },
 
-      /**
-       * Keyframes
-       */
       keyframes: {
         spotlight: {
           "0%": {
